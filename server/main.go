@@ -6,6 +6,7 @@ import (
 	"github.com/omgupta1608/aftershoot_task/middlewares"
 	"github.com/omgupta1608/aftershoot_task/routes"
 	"github.com/omgupta1608/aftershoot_task/utils"
+	_ "github.com/omgupta1608/aftershoot_task/cfg"
 )
 
 func main() {

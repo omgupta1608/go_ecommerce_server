@@ -28,5 +28,8 @@ func main() {
 	routes.InitPublicRoutes(router)
 	routes.InitPrivateRoutes(router)
 
+	// schedule cron jobs
+	utils.ScheduleJobs()
+
 	server.Run(":5000")
 }

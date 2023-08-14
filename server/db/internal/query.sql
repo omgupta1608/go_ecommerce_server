@@ -14,6 +14,10 @@ WHERE id = $1 LIMIT 1;
 SELECT * FROM orders
 WHERE id = $1 LIMIT 1;
 
+-- name: GetFailedOrderProducts :many
+SELECT * from order_products
+WHERE placed = false;
+
 -- name: CreateUser :one
 INSERT INTO users (
   name, email, password
@@ -51,6 +55,9 @@ UPDATE products SET in_stock = $1 WHERE id = $2 RETURNING *;
 
 -- name: UpdateOrderStatus :one
 UPDATE orders SET status = $1 WHERE id = $2 RETURNING *;
+
+-- name: UpdateOrderProductStatus :one
+UPDATE order_products SET placed = $1 WHERE id = $2 RETURNING *;
 
 -- name: CreateOrder :one
 INSERT INTO orders (

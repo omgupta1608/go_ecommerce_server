@@ -166,6 +166,43 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getFailedOrderProducts = `-- name: GetFailedOrderProducts :many
+SELECT id, order_id, product_id, quantity, created_at, updated_at, deleted_at, placed from order_products
+WHERE placed = false
+`
+
+func (q *Queries) GetFailedOrderProducts(ctx context.Context) ([]OrderProduct, error) {
+	rows, err := q.db.QueryContext(ctx, getFailedOrderProducts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []OrderProduct
+	for rows.Next() {
+		var i OrderProduct
+		if err := rows.Scan(
+			&i.ID,
+			&i.OrderID,
+			&i.ProductID,
+			&i.Quantity,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.DeletedAt,
+			&i.Placed,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getOrderById = `-- name: GetOrderById :one
 SELECT id, user_id, status, created_at, updated_at, deleted_at FROM orders
 WHERE id = $1 LIMIT 1
@@ -372,6 +409,31 @@ func (q *Queries) ListProductsWithRatings(ctx context.Context) ([]ListProductsWi
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateOrderProductStatus = `-- name: UpdateOrderProductStatus :one
+UPDATE order_products SET placed = $1 WHERE id = $2 RETURNING id, order_id, product_id, quantity, created_at, updated_at, deleted_at, placed
+`
+
+type UpdateOrderProductStatusParams struct {
+	Placed bool
+	ID     uuid.UUID
+}
+
+func (q *Queries) UpdateOrderProductStatus(ctx context.Context, arg UpdateOrderProductStatusParams) (OrderProduct, error) {
+	row := q.db.QueryRowContext(ctx, updateOrderProductStatus, arg.Placed, arg.ID)
+	var i OrderProduct
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+		&i.Placed,
+	)
+	return i, err
 }
 
 const updateOrderStatus = `-- name: UpdateOrderStatus :one

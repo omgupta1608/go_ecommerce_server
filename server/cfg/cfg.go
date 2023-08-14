@@ -10,6 +10,6 @@ import (
 var TOKEN_SECRET []byte
 
 func init() {
-	godotenv.Load(".env")
+	godotenv.Load()
 	TOKEN_SECRET  = []byte(os.Getenv("TOKEN_SECRET"))
 }

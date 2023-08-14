@@ -63,10 +63,14 @@ func PlaceOrderHandler(c *gin.Context) {
 		})
 
 		if placed {
-			db.Conn.UpdateProductInStockUnits(c, db.UpdateProductInStockUnitsParams{
+			_, err := db.Conn.UpdateProductInStockUnits(c, db.UpdateProductInStockUnitsParams{
 				InStock: product.InStock - order_product.Quantity,
 				ID:      product.ID,
 			})
+
+			if err != nil {
+				// error
+			}
 
 			total += int(product.Price * float64(order_product.Quantity))
 		}

@@ -3,7 +3,9 @@ sql:
   - engine: "postgresql"
     queries: "db/internal/query.sql"
     schema: "db/internal/schema.sql"
+    strict_order_by: false
     gen:
       go:
         package: "db"
         out: "db"
+        

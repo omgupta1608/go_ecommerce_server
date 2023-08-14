@@ -75,6 +75,7 @@ CREATE TABLE order_products
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
+    placed boolean NOT NULL DEFAULT true,
     CONSTRAINT order_products_pkey PRIMARY KEY (id),
     CONSTRAINT order_products_order_fkey FOREIGN KEY (order_id)
         REFERENCES public.orders (id) MATCH SIMPLE

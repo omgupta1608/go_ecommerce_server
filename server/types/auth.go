@@ -2,13 +2,14 @@ package types
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 type (
 	CustomClaims struct {
-		UserId   string `json:"user_id"`
-		IsActive bool   `json:"is_active"`
-		Email    string `json:"email"`
+		UserId   uuid.UUID `json:"user_id"`
+		IsActive bool      `json:"is_active"`
+		Email    string    `json:"email"`
 	}
 	AuthCustomClaims struct {
 		jwt.StandardClaims
@@ -21,7 +22,6 @@ type (
 	RegisterBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
-		Name string `json:"name"`
-		
+		Name     string `json:"name"`
 	}
 )

@@ -10,5 +10,6 @@ func initProductRoutes(router *gin.RouterGroup) {
 	{
 		productRouter.POST("/new", handlers.AddNewProductHandler)
 		productRouter.GET("/", handlers.GetProductsHandler)
+		productRouter.POST("/rate", handlers.RateProductHandler)
 	}
 }

@@ -30,7 +30,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	cc := types.CustomClaims{
-		UserId:   user.ID.String(),
+		UserId:   user.ID,
 		IsActive: true,
 		Email:    user.Email,
 	}
@@ -68,7 +68,7 @@ func RegisterHandler(c *gin.Context) {
 	})
 
 	cc := types.CustomClaims{
-		UserId:   user.ID.String(),
+		UserId:   user.ID,
 		IsActive: true,
 		Email:    user.Email,
 	}

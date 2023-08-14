@@ -28,6 +28,7 @@ type OrderProduct struct {
 	CreatedAt time.Time
 	UpdatedAt sql.NullTime
 	DeletedAt sql.NullTime
+	Placed    bool
 }
 
 type Product struct {

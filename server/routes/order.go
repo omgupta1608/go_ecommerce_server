@@ -10,5 +10,6 @@ func initOrderRoutes(router *gin.RouterGroup) {
 	{
 		orderRouter.POST("/new", handlers.PlaceOrderHandler)
 		orderRouter.POST("/process", handlers.ProcessOrderHandler)
+		orderRouter.GET("/:id", handlers.GetOrderDetails)
 	}
 }

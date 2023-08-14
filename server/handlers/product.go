@@ -37,3 +37,7 @@ func AddNewProductHandler(c *gin.Context) {
 	})
 	return
 }
+
+func GetProductsHandler (c *gin.Context) {
+	
+}

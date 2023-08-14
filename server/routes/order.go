@@ -6,8 +6,9 @@ import (
 )
 
 func initOrderRoutes(router *gin.RouterGroup) {
-	userRouter := router.Group("/order")
+	orderRouter := router.Group("/order")
 	{
-		userRouter.POST("/new", handlers.PlaceOrderHandler)
+		orderRouter.POST("/new", handlers.PlaceOrderHandler)
+		orderRouter.POST("/process", handlers.ProcessOrderHandler)
 	}
 }

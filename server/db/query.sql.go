@@ -11,6 +11,64 @@ import (
 	"github.com/google/uuid"
 )
 
+const createOrder = `-- name: CreateOrder :one
+INSERT INTO orders (
+  user_id, status
+) VALUES (
+  $1, $2
+)
+RETURNING id, user_id, status, created_at, updated_at, deleted_at
+`
+
+type CreateOrderParams struct {
+	UserID uuid.UUID
+	Status string
+}
+
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
+	row := q.db.QueryRowContext(ctx, createOrder, arg.UserID, arg.Status)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Status,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const createOrderProduct = `-- name: CreateOrderProduct :one
+INSERT INTO order_products (
+  order_id, product_id, quantity
+) VALUES (
+  $1, $2, $3
+)
+RETURNING id, order_id, product_id, quantity, created_at, updated_at, deleted_at
+`
+
+type CreateOrderProductParams struct {
+	OrderID   uuid.UUID
+	ProductID uuid.UUID
+	Quantity  int32
+}
+
+func (q *Queries) CreateOrderProduct(ctx context.Context, arg CreateOrderProductParams) (OrderProduct, error) {
+	row := q.db.QueryRowContext(ctx, createOrderProduct, arg.OrderID, arg.ProductID, arg.Quantity)
+	var i OrderProduct
+	err := row.Scan(
+		&i.ID,
+		&i.OrderID,
+		&i.ProductID,
+		&i.Quantity,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const createProduct = `-- name: CreateProduct :one
 INSERT INTO products (
   name, price, in_stock
@@ -71,6 +129,26 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
+const getProductById = `-- name: GetProductById :one
+SELECT id, name, price, in_stock, created_at, updated_at, deleted_at FROM products
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetProductById(ctx context.Context, id uuid.UUID) (Product, error) {
+	row := q.db.QueryRowContext(ctx, getProductById, id)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Price,
+		&i.InStock,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT id, name, email, password, created_at, deleted_at, updated_at FROM users
 WHERE email = $1 LIMIT 1
@@ -109,4 +187,13 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const updateProductInStockUnits = `-- name: UpdateProductInStockUnits :exec
+UPDATE products SET in_stock = $1 RETURNING id, name, price, in_stock, created_at, updated_at, deleted_at
+`
+
+func (q *Queries) UpdateProductInStockUnits(ctx context.Context, inStock int32) error {
+	_, err := q.db.ExecContext(ctx, updateProductInStockUnits, inStock)
+	return err
 }

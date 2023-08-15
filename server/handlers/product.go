@@ -8,6 +8,7 @@ import (
 	"github.com/omgupta1608/aftershoot_task/db"
 	"github.com/omgupta1608/aftershoot_task/types"
 	"github.com/omgupta1608/aftershoot_task/utils"
+	ws "github.com/omgupta1608/aftershoot_task/websocket"
 )
 
 func AddNewProductHandler(c *gin.Context) {
@@ -28,6 +29,11 @@ func AddNewProductHandler(c *gin.Context) {
 		utils.SendError(c, http.StatusInternalServerError, err)
 		return
 	}
+
+		// send ws msg - new user
+		ws.SendWsMessage(types.SenderBody{
+			Type: "product",
+		})
 
 	utils.SendResponse(c, "Product Added!", map[string]any{
 		"product_id":          product.ID.String(),

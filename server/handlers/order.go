@@ -11,6 +11,7 @@ import (
 	"github.com/omgupta1608/aftershoot_task/db"
 	"github.com/omgupta1608/aftershoot_task/types"
 	"github.com/omgupta1608/aftershoot_task/utils"
+	ws "github.com/omgupta1608/aftershoot_task/websocket"
 )
 
 func PlaceOrderHandler(c *gin.Context) {
@@ -91,6 +92,11 @@ func PlaceOrderHandler(c *gin.Context) {
 			wg.Done()
 		}(order_product)
 	}
+
+	// send ws msg - new user
+	ws.SendWsMessage(types.SenderBody{
+		Type: "order",
+	})
 
 	// for the go routines to finish
 	wg.Wait()

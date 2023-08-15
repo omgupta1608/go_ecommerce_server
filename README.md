@@ -10,6 +10,7 @@ Aftershoot Task - Om Gupta
 - Go to the server directory - `cd server/`
 - Run `make db-migrate-up` to seed the database
 - The API server is ready to use on `http://localhost:5000`
+- The UI can be run using [vscode live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) or just by simply opening the html file
 
 ## Testing
 - APIs are avaliable at `http://localhost:5000/api/v1/`
@@ -19,6 +20,9 @@ Aftershoot Task - Om Gupta
 - The application contains 2 types of users or 2 tenants - CUSTOMER and ADMIN
 - The server differentiates users with the help of the web token they provide
 - Some APIs are available only to ADMINs or CUSTOMERs and some are available for both
+- A websocket server is also spawned when we run the server. This server is used to maintain realtime communication between the server and the analytics UI
+- A database layer is created using sqlc
+
 ## Features Implemented
 - Customer/Admin Register
 - Customer/Admin Login
@@ -29,6 +33,9 @@ Aftershoot Task - Om Gupta
 - Get Order Details - ADMIN and CUSTOMER
 - Get Product Information - ADMIN and CUSTOMER
 - Get Top 3 Customers - ADMIN and CUSTOMER
+- Bonus Feature
+    - Simple UI in the `ui/index.html` file
+    - Whenever a new Order/Product/User is added to the system, it is reflected in real time on the UI
 
 
 ## APIs

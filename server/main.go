@@ -1,17 +1,19 @@
 package main
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/omgupta1608/aftershoot_task/cfg"
 	"github.com/omgupta1608/aftershoot_task/db"
 	"github.com/omgupta1608/aftershoot_task/middlewares"
 	"github.com/omgupta1608/aftershoot_task/routes"
+	ws "github.com/omgupta1608/aftershoot_task/websocket"
+
 	"github.com/omgupta1608/aftershoot_task/utils"
 )
 
 func main() {
+	go ws.H.Run()
+	
 	// initialize router
 	server := gin.New()
 	server.Use(gin.Logger())
@@ -28,9 +30,11 @@ func main() {
 	// attach cors middlware
 	server.Use(middlewares.CORSMiddleware())
 
+	// initialize websocket handler
 	server.GET("/", func(ctx *gin.Context) {
-		ctx.JSON(http.StatusOK, gin.H{"aftershoot_task_server": "v1.0"})
+		ws.ServeWs(ctx.Writer, ctx.Request)
 	})
+
 	router := server.Group("/api/" + utils.GetVersion() + "/")
 
 	// initialize routes

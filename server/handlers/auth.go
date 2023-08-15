@@ -8,6 +8,7 @@ import (
 	"github.com/omgupta1608/aftershoot_task/db"
 	"github.com/omgupta1608/aftershoot_task/types"
 	"github.com/omgupta1608/aftershoot_task/utils"
+	ws "github.com/omgupta1608/aftershoot_task/websocket"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -93,6 +94,11 @@ func RegisterHandler(c *gin.Context) {
 		utils.SendError(c, http.StatusInternalServerError, err)
 		return
 	}
+
+	// send ws msg - new user
+	ws.SendWsMessage(types.SenderBody{
+		Type: "user",
+	})
 
 	utils.SendResponse(c, "Registered", map[string]any{
 		"access_token": token,

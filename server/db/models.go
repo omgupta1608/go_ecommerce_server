@@ -57,11 +57,12 @@ type RefOrderStatus struct {
 }
 
 type User struct {
-	ID        uuid.UUID
-	Name      string
-	Email     string
-	Password  string
-	CreatedAt time.Time
-	DeletedAt sql.NullTime
-	UpdatedAt sql.NullTime
+	ID         uuid.UUID
+	Name       string
+	Email      string
+	Password   string
+	TenantType string
+	CreatedAt  time.Time
+	DeletedAt  sql.NullTime
+	UpdatedAt  sql.NullTime
 }

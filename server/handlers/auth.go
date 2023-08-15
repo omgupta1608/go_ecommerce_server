@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,14 +26,15 @@ func LoginHandler(c *gin.Context) {
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
 	if err != nil {
-		utils.SendError(c, http.StatusInternalServerError, err)
+		utils.SendError(c, http.StatusBadRequest, errors.New("Invalid Credentials"))
 		return
 	}
 
 	cc := types.CustomClaims{
-		UserId:   user.ID,
-		IsActive: true,
-		Email:    user.Email,
+		UserId:     user.ID,
+		IsActive:   true,
+		Email:      user.Email,
+		TenantType: user.TenantType,
 	}
 
 	token, err := utils.GenerateJWTToken(cc)
@@ -56,21 +58,33 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
+	if utils.Find(utils.TENANTS[:], body.TenantType) == -1 {
+		utils.SendError(c, http.StatusBadRequest, errors.New("INVALID_TENANT_TYPE"))
+		return
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	if err != nil {
 		utils.SendError(c, http.StatusInternalServerError, err)
 		return
 	}
 	user, err := db.Conn.CreateUser(c, db.CreateUserParams{
-		Name:     body.Name,
-		Email:    body.Email,
-		Password: string(hashedPassword),
+		Name:       body.Name,
+		Email:      body.Email,
+		Password:   string(hashedPassword),
+		TenantType: body.TenantType,
 	})
+
+	if err != nil {
+		utils.SendError(c, http.StatusInternalServerError, err)
+		return
+	}
 
 	cc := types.CustomClaims{
 		UserId:   user.ID,
 		IsActive: true,
 		Email:    user.Email,
+		TenantType: user.TenantType,
 	}
 
 	token, err := utils.GenerateJWTToken(cc)

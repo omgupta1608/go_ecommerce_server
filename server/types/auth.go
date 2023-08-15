@@ -7,9 +7,10 @@ import (
 
 type (
 	CustomClaims struct {
-		UserId   uuid.UUID `json:"user_id"`
-		IsActive bool      `json:"is_active"`
-		Email    string    `json:"email"`
+		TenantType string    `json:"tenant_type"`
+		UserId     uuid.UUID `json:"user_id"`
+		IsActive   bool      `json:"is_active"`
+		Email      string    `json:"email"`
 	}
 	AuthCustomClaims struct {
 		jwt.StandardClaims
@@ -20,8 +21,9 @@ type (
 		Password string `json:"password"`
 	}
 	RegisterBody struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Name     string `json:"name"`
+		Email      string `json:"email"`
+		Password   string `json:"password"`
+		Name       string `json:"name"`
+		TenantType string `json:"tenant_type"`
 	}
 )

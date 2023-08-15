@@ -20,9 +20,9 @@ WHERE placed = false;
 
 -- name: CreateUser :one
 INSERT INTO users (
-  name, email, password
+  name, email, password, tenant_type
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 )
 RETURNING *;
 

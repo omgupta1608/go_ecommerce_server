@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -52,7 +51,7 @@ func PlaceOrderHandler(c *gin.Context) {
 		// add wait group counter
 		wg.Add(1)
 		go func(order_p types.OrderProducts) {
-			fmt.Println("Starting: ", order_p.ProductId)
+			// utils.PrintToConsole("Starting: " + order_p.ProductId, "info")
 			product, err := db.Conn.GetProductById(c, product_id)
 			if err != nil {
 				log.Fatal("Error in getting product by id: ", product_id)
@@ -88,7 +87,7 @@ func PlaceOrderHandler(c *gin.Context) {
 				Product_Id: order_p.ProductId,
 				Placed:     placed,
 			})
-			fmt.Println("Done: ", order_p.ProductId)
+			// utils.PrintToConsole("Done: " + order_p.ProductId, "info")
 			wg.Done()
 		}(order_product)
 	}
@@ -103,7 +102,6 @@ func PlaceOrderHandler(c *gin.Context) {
 		"products":    resp,
 		"order_total": total,
 	})
-	return
 }
 
 func ProcessOrderHandler(c *gin.Context) {
@@ -135,23 +133,30 @@ func ProcessOrderHandler(c *gin.Context) {
 		Status: body.Status,
 	})
 
+	if err != nil {
+		utils.SendError(c, http.StatusInternalServerError, err)
+		return
+	}
+
 	utils.SendResponse(c, "Order Updated", map[string]any{})
-	return
 }
 
 func GetOrderDetails(c *gin.Context) {
 	order_id, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		// error
+		utils.SendError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	order, err := db.Conn.GetOrderDetails(c, order_id)
 	if err != nil {
-		// error
+		utils.SendError(c, http.StatusInternalServerError, err)
+		return
 	}
 
 	if order == nil || len(order) == 0 {
-		// error - no such order
+		utils.SendError(c, http.StatusInternalServerError, errors.New("Order not found. Invalid order id"))
+		return
 	}
 
 	var products []types.OrderProduct
@@ -178,5 +183,4 @@ func GetOrderDetails(c *gin.Context) {
 		"products":    products,
 		"order_total": order_total,
 	})
-	return
 }

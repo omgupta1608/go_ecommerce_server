@@ -56,6 +56,6 @@ func ScheduleJobs() {
 	// run retryFailedOrders cron job every day at 6 am
 	scheduler.AddFunc("0 6 * * *", retryFailedOrders)
 
-	fmt.Println("Scheduled 1 job")
+	PrintToConsole("Scheduled 1 job", "info")
 	scheduler.Start()
 }

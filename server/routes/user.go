@@ -11,4 +11,3 @@ func initUserRoutes(router *gin.RouterGroup) {
 		userRouter.GET("/top-3", handlers.GetTop3CustomersHander)
 	}
 }
-

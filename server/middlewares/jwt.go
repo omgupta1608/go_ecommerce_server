@@ -37,9 +37,12 @@ func JWTMiddleware() gin.HandlerFunc {
 			utils.SendResponse(c, "Account not active", map[string]any{})
 			return
 		}
+
+		// store user data in this context
 		c.Set("user_id", user.UserId.String())
 		c.Set("user_email", user.Email)
 		c.Set("is_user_active", user.IsActive)
+		c.Set("tenant_type", user.TenantType)
 		c.Next()
 	}
 }
@@ -61,7 +64,7 @@ func ParseToken(tokenString string) (*types.CustomClaims, error) {
 	// extract claims
 	claims, ok := token.Claims.(*types.AuthCustomClaims)
 	if err == nil && ok && token.Valid {
-		user := types.CustomClaims{UserId: claims.UserId, Email: claims.Email, IsActive: claims.IsActive}
+		user := types.CustomClaims{UserId: claims.UserId, Email: claims.Email, IsActive: claims.IsActive, TenantType: claims.TenantType}
 		return &user, nil
 	}
 

@@ -138,27 +138,34 @@ func (q *Queries) CreateProductRating(ctx context.Context, arg CreateProductRati
 
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (
-  name, email, password
+  name, email, password, tenant_type
 ) VALUES (
-  $1, $2, $3
+  $1, $2, $3, $4
 )
-RETURNING id, name, email, password, created_at, deleted_at, updated_at
+RETURNING id, name, email, password, tenant_type, created_at, deleted_at, updated_at
 `
 
 type CreateUserParams struct {
-	Name     string
-	Email    string
-	Password string
+	Name       string
+	Email      string
+	Password   string
+	TenantType string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser, arg.Name, arg.Email, arg.Password)
+	row := q.db.QueryRowContext(ctx, createUser,
+		arg.Name,
+		arg.Email,
+		arg.Password,
+		arg.TenantType,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.TenantType,
 		&i.CreatedAt,
 		&i.DeletedAt,
 		&i.UpdatedAt,
@@ -333,7 +340,7 @@ func (q *Queries) GetTop3Customers(ctx context.Context) ([]GetTop3CustomersRow, 
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, name, email, password, created_at, deleted_at, updated_at FROM users
+SELECT id, name, email, password, tenant_type, created_at, deleted_at, updated_at FROM users
 WHERE email = $1 LIMIT 1
 `
 
@@ -345,6 +352,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.TenantType,
 		&i.CreatedAt,
 		&i.DeletedAt,
 		&i.UpdatedAt,
@@ -353,7 +361,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error
 }
 
 const getUserById = `-- name: GetUserById :one
-SELECT id, name, email, password, created_at, deleted_at, updated_at FROM users
+SELECT id, name, email, password, tenant_type, created_at, deleted_at, updated_at FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -365,6 +373,7 @@ func (q *Queries) GetUserById(ctx context.Context, id uuid.UUID) (User, error) {
 		&i.Name,
 		&i.Email,
 		&i.Password,
+		&i.TenantType,
 		&i.CreatedAt,
 		&i.DeletedAt,
 		&i.UpdatedAt,

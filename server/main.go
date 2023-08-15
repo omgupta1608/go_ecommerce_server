@@ -10,14 +10,16 @@ import (
 )
 
 func main() {
-	if err := db.Connect(); err != nil {
-		utils.PrintToConsole("Error in connecting to database: " + err.Error(), "error")
-		return
-	}
 	// initialize router
 	server := gin.New()
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
+
+	// connect to db
+	if err := db.Connect(); err != nil {
+		utils.PrintToConsole("Error in connecting to database: " + err.Error(), "error")
+		return
+	}
 
 	// attach cors middlware
 	server.Use(middlewares.CORSMiddleware())

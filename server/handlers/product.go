@@ -35,7 +35,6 @@ func AddNewProductHandler(c *gin.Context) {
 		"product_price":       product.Price,
 		"is_product_in_stock": product.InStock,
 	})
-	return
 }
 
 func GetProductsHandler(c *gin.Context) {
@@ -82,5 +81,5 @@ func RateProductHandler(c *gin.Context) {
 	}
 
 	utils.SendResponse(c, "Ratings saved", map[string]any{})
-	return
+
 }

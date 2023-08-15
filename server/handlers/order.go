@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -24,8 +27,6 @@ func PlaceOrderHandler(c *gin.Context) {
 		return
 	}
 
-	// this is where each product in that products array will be handled by a separate go routing
-
 	order, err := db.Conn.CreateOrder(c, db.CreateOrderParams{
 		UserID: user.UserId,
 		Status: utils.ORDER_INITIATED,
@@ -39,6 +40,7 @@ func PlaceOrderHandler(c *gin.Context) {
 	var resp []types.PlaceOrderResponse
 	total := 0
 	actual_total := 0
+	var wg sync.WaitGroup
 	for _, order_product := range body.Products {
 		placed := true
 		product_id, err := uuid.Parse(order_product.ProductId)
@@ -46,42 +48,53 @@ func PlaceOrderHandler(c *gin.Context) {
 			utils.SendError(c, http.StatusInternalServerError, err)
 			return
 		}
-		product, err := db.Conn.GetProductById(c, product_id)
-		if err != nil {
-			utils.SendError(c, http.StatusInternalServerError, err)
-			return
-		}
-		if product.InStock < order_product.Quantity {
-			placed = false
-		}
 
-		db.Conn.CreateOrderProduct(c, db.CreateOrderProductParams{
-			OrderID:   order.ID,
-			ProductID: product_id,
-			Quantity:  order_product.Quantity,
-			Placed:    placed,
-		})
-
-		if placed {
-			_, err := db.Conn.UpdateProductInStockUnits(c, db.UpdateProductInStockUnitsParams{
-				InStock: product.InStock - order_product.Quantity,
-				ID:      product.ID,
-			})
-
+		// add wait group counter
+		wg.Add(1)
+		go func(order_p types.OrderProducts) {
+			fmt.Println("Starting: ", order_p.ProductId)
+			product, err := db.Conn.GetProductById(c, product_id)
 			if err != nil {
-				// error
+				log.Fatal("Error in getting product by id: ", product_id)
+				return
+			}
+			if product.InStock < order_p.Quantity {
+				placed = false
 			}
 
-			total += int(product.Price * float64(order_product.Quantity))
-		}
-		actual_total += int(product.Price * float64(order_product.Quantity))
+			db.Conn.CreateOrderProduct(c, db.CreateOrderProductParams{
+				OrderID:   order.ID,
+				ProductID: product_id,
+				Quantity:  order_p.Quantity,
+				Placed:    placed,
+			})
 
-		resp = append(resp, types.PlaceOrderResponse{
-			Product_Id: order_product.ProductId,
-			Placed:     placed,
-		})
+			if placed {
+				_, err := db.Conn.UpdateProductInStockUnits(c, db.UpdateProductInStockUnitsParams{
+					InStock: product.InStock - order_p.Quantity,
+					ID:      product.ID,
+				})
+
+				if err != nil {
+					log.Fatal("Error in updating product in_stock units: ", err.Error())
+					return
+				}
+
+				total += int(product.Price * float64(order_p.Quantity))
+			}
+			actual_total += int(product.Price * float64(order_p.Quantity))
+
+			resp = append(resp, types.PlaceOrderResponse{
+				Product_Id: order_p.ProductId,
+				Placed:     placed,
+			})
+			fmt.Println("Done: ", order_p.ProductId)
+			wg.Done()
+		}(order_product)
 	}
 
+	// for the go routines to finish
+	wg.Wait()
 	msg := "Order Placed. Thanks"
 	if total < actual_total {
 		msg = "Order Placed partially. We'll process the missing products as soon as they are available. Thanks"

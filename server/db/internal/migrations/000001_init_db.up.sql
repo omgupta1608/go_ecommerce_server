@@ -18,6 +18,13 @@ CREATE TABLE IF NOT EXISTS ref_order_status
     CONSTRAINT ref_order_status_pkey PRIMARY KEY (id)
 );
 
+INSERT INTO public.ref_order_status(
+	id, description)
+	VALUES ('INITIATED', 'INITIATED'),
+    ('CANCELLED', 'CANCELLED'),
+    ('FAILED', 'FAILED'),
+    ('COMPLETED', 'COMPLETED');
+
 CREATE TABLE IF NOT EXISTS ratings
 (
     id uuid NOT NULL DEFAULT gen_random_uuid(),

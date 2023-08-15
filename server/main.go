@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/omgupta1608/aftershoot_task/cfg"
 	"github.com/omgupta1608/aftershoot_task/db"
@@ -26,6 +28,9 @@ func main() {
 	// attach cors middlware
 	server.Use(middlewares.CORSMiddleware())
 
+	server.GET("/", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"aftershoot_task_server": "v1.0"})
+	})
 	router := server.Group("/api/" + utils.GetVersion() + "/")
 
 	// initialize routes

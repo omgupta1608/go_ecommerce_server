@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users
     name text COLLATE pg_catalog."default" NOT NULL,
     email text COLLATE pg_catalog."default" NOT NULL,
     password text COLLATE pg_catalog."default" NOT NULL,
+    tenant_type text COLLATE pg_catalog."default" NOT NULL DEFAULT 'CUSTOMER'::text,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     deleted_at timestamp with time zone,
     updated_at timestamp with time zone,

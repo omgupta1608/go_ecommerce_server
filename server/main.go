@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	_ "github.com/omgupta1608/aftershoot_task/cfg"
 	"github.com/omgupta1608/aftershoot_task/db"
 	"github.com/omgupta1608/aftershoot_task/middlewares"
 	"github.com/omgupta1608/aftershoot_task/routes"
 	"github.com/omgupta1608/aftershoot_task/utils"
-	_ "github.com/omgupta1608/aftershoot_task/cfg"
 )
 
 func main() {
@@ -17,9 +17,11 @@ func main() {
 
 	// connect to db
 	if err := db.Connect(); err != nil {
-		utils.PrintToConsole("Error in connecting to database: " + err.Error(), "error")
+		utils.PrintToConsole("Error in connecting to database: "+err.Error(), "error")
 		return
 	}
+
+	utils.PrintToConsole("Connected to Database!", "info")
 
 	// attach cors middlware
 	server.Use(middlewares.CORSMiddleware())

@@ -20,7 +20,7 @@ func LoginHandler(c *gin.Context) {
 
 	user, err := db.Conn.GetUserByEmail(c, body.Email)
 	if err != nil {
-		utils.SendError(c, http.StatusInternalServerError, err)
+		utils.SendError(c, http.StatusBadRequest, errors.New("Invalid Credentials"))
 		return
 	}
 

@@ -17,6 +17,7 @@ Aftershoot Task - Om Gupta
 - List of all APIs and their usage is present in this postman collection as well as written below in the 'Available APIs section'
 
 ## Design Description
+- Postgres is used as the primary database
 - The application contains 2 types of users or 2 tenants - CUSTOMER and ADMIN
 - The server differentiates users with the help of the web token they provide
 - Some APIs are available only to ADMINs or CUSTOMERs and some are available for both
@@ -33,6 +34,8 @@ Aftershoot Task - Om Gupta
 - Get Order Details - ADMIN and CUSTOMER
 - Get Product Information - ADMIN and CUSTOMER
 - Get Top 3 Customers - ADMIN and CUSTOMER
+- Retry Mechanism - A cron job runs everyday at 6am to see if there are any pending orders and checks if the respective products are available. If yes, it tries to place the remaining products in that order.
+- Concurrent order processing for orders containing multiple products. Goroutines and waitgroups are used to process multiple products in an order simultaneous while maintaining consistency.
 - Bonus Feature
     - Simple UI in the `ui/index.html` file
     - Whenever a new Order/Product/User is added to the system, it is reflected in real time on the UI
